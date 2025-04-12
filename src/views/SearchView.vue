@@ -14,13 +14,13 @@
         <tbody>
           <tr v-for="crypto in searchResults" :key="crypto.id" @click="openPersonalPage(crypto)">
             <td>{{ crypto.name }} ({{ crypto.symbol }})</td>
-            <td>\${{ crypto.price }}</td>
+            <td>${{ formatPrice(crypto.price) }}</td>
             <td>
-              <span :class="crypto.priceChange >= 0 ? 'positive' : 'negative'">
-                {{ crypto.priceChange }}%
+              <span :class="getChangeClass(crypto.priceChange)">
+                {{ formatChangeWithSign(crypto.priceChange) }}%
               </span>
             </td>
-            <td>\${{ crypto.marketCap }}</td>
+            <td>${{ formatMarketCap(crypto.marketCap) }}</td>
           </tr>
         </tbody>
       </table>
@@ -86,14 +86,43 @@ export default {
       this.$router.push({
         path: '/personal',
         query: {
-          id: crypto.id,
           name: crypto.name,
-          symbol: crypto.symbol,
           price: crypto.price,
           priceChange: crypto.priceChange,
           marketCap: crypto.marketCap
         }
       });
+    },
+    formatPrice(price) {
+      if (price) {
+        return price.toLocaleString('ru-RU', { minimumFractionDigits: 2 });
+      } else {
+        return '0';
+      }
+    },
+    formatChangeWithSign(change) {
+      if (change) {
+        if (change >= 0) {
+          return '+' + change.toFixed(2);
+        } else {
+          return change.toFixed(2);
+        }
+      } else {
+        return '0';
+      }
+    },
+    getChangeClass(change) {
+      if (change >= 0) {
+        return 'positive';
+      } else {
+        return 'negative';
+      }
+    },
+    formatMarketCap(cap) {
+      if (!cap) {
+        return '0';
+      }
+      return cap;
     }
   }
 };
@@ -106,11 +135,11 @@ export default {
 }
 
 .positive {
-  color: green;
+  color: #28a745;
 }
 
 .negative {
-  color: red;
+  color: #dc3545;
 }
 
 .crypto-table tbody tr {

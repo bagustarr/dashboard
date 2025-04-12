@@ -10,7 +10,6 @@
         <p class="mt-2">Загрузка данных...</p>
       </div>
       
-      
       <table v-else class="crypto-table table table-dark table-hover">
         <thead>
           <tr>
@@ -30,13 +29,13 @@
                 {{ crypto.name }}
               </div>
             </td>
-            <td>${{ numberFormat(crypto.price) }}</td>
+            <td>${{ formatPrice(crypto.price) }}</td>
             <td>
-              <span :class="crypto.change >= 0 ? 'positive' : 'negative'">
-                {{ crypto.change >= 0 ? '+' : '' }}{{ changeFormat(crypto.change) }}%
+              <span :class="getChangeClass(crypto.change)">
+                {{ formatChangeWithSign(crypto.change) }}%
               </span>
             </td>
-            <td>${{ marketCapFormat(crypto.marketCap) }}</td>
+            <td>${{ formatMarketCap(crypto.marketCap) }}</td>
           </tr>
         </tbody>
       </table>
@@ -50,35 +49,27 @@ import config from '@/config';
 
 export default {
   name: 'HomeView',
-  data: function() {
+  data() {
     return {
       coins: [],
-      isLoading: false,
-     
+      isLoading: false
     };
   },
   methods: {
-    loadCryptoData: async function() {
+    async loadCryptoData() {
       this.isLoading = true;
       
-
-      const API_KEY = config.apiKeys.coingecko;
-      const result = await axios.get(`${config.api.baseUrl}/coins/markets`, {
+      const response = await axios.get(`${config.api.baseUrl}/coins/markets`, {
         params: {
-          vs_currency: config.api.defaultCurrency,
+          vs_currency: 'usd',
           order: 'market_cap_desc',
-          per_page: config.api.requestLimit,
+          per_page: 20,
           page: 1,
-          sparkline: false,
-          price_change_percentage: '24h',
-          x_cg_demo_api_key: API_KEY
-        },
-        headers: {
-          'x-cg-demo-api-key': API_KEY
+          sparkline: false
         }
       });
 
-      this.coins = result.data.map(crypto => ({
+      this.coins = response.data.map(crypto => ({
         id: crypto.id,
         name: `${crypto.name} (${crypto.symbol.toUpperCase()})`,
         price: crypto.current_price,
@@ -93,50 +84,64 @@ export default {
       this.$router.push({
         path: '/personal',
         query: {
-          id: crypto.id,
           name: crypto.name,
-          symbol: crypto.symbol,
           price: crypto.price,
           priceChange: crypto.change,
           marketCap: crypto.marketCap
         }
       });
     },
-    numberFormat(price) {
-      return price ? price.toLocaleString(undefined, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      }) : 'N/A';
+    formatPrice(price) {
+      if (price) {
+        return price.toLocaleString('ru-RU', { minimumFractionDigits: 2 });
+      } else {
+        return '0';
+      }
     },
-
-    changeFormat(change) {
-      return change ? change.toFixed(2) : 'N/A';
+    formatChangeWithSign(change) {
+      if (change) {
+        if (change >= 0) {
+          return '+' + change.toFixed(2);
+        } else {
+          return change.toFixed(2);
+        }
+      } else {
+        return '0';
+      }
     },
-
-    marketCapFormat(cap) {
-      if (!cap) return 'N/A';
-
-      if (cap >= 1e12) return (cap / 1e12).toFixed(2) + 'T';
-      if (cap >= 1e9) return (cap / 1e9).toFixed(2) + 'B';
-      if (cap >= 1e6) return (cap / 1e6).toFixed(2) + 'M';
-
-      return cap.toLocaleString();
+    getChangeClass(change) {
+      if (change >= 0) {
+        return 'positive';
+      } else {
+        return 'negative';
+      }
+    },
+    formatMarketCap(cap) {
+      if (!cap) {
+        return '0';
+      }
+      
+      if (cap >= 1e12) {
+        return (cap / 1e12).toFixed(2) + 'T';
+      } else if (cap >= 1e9) {
+        return (cap / 1e9).toFixed(2) + 'B';
+      } else if (cap >= 1e6) {
+        return (cap / 1e6).toFixed(2) + 'M';
+      } else {
+        return cap.toLocaleString('ru-RU');
+      }
     }
   },
-  mounted: function() {
+  mounted() {
     this.loadCryptoData();
   }
-}
+};
 </script>
 
 <style scoped>
 .crypto-table {
   width: 100%;
   margin-top: 20px;
-  border-collapse: separate;
-  border-spacing: 0;
-  border-radius: 8px;
-  overflow: hidden;
 }
 
 .crypto-table th,
@@ -145,28 +150,19 @@ export default {
   text-align: left;
 }
 
-.crypto-table thead th {
-  background-color: #1f1f1f;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
-}
-
-.crypto-table tbody tr:hover {
-  background-color: rgba(255, 255, 255, 0.05);
-}
-
 .positive {
-  color: #00ff88;
-  background-color: rgba(0, 255, 136, 0.1);
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-weight: 500;
+  color: #28a745;
 }
 
 .negative {
-  color: #ff4444;
-  background-color: rgba(255, 68, 68, 0.1);
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-weight: 500;
+  color: #dc3545;
+}
+
+.crypto-table tbody tr {
+  cursor: pointer;
+}
+
+.crypto-table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 </style>

@@ -1,19 +1,14 @@
 <template>
-  <div class="news">
-    <div class="container mt-4">
-      <h1>Новости криптовалют</h1>
-      
-      <div class="row mt-4">
-        <div v-for="article in news" :key="article.id" class="col-md-6 mb-4">
-          <div class="card bg-dark text-white">
-            <div class="card-body">
-              <h5 class="card-title">{{ article.title }}</h5>
-              <p class="card-text text-muted">
-                {{ article.date }} | Источник: {{ article.source }}
-              </p>
-              <button class="btn btn-outline-primary mt-2">Читать полностью</button>
-            </div>
-          </div>
+  <div class="container">
+    <h1 class="text-center mb-4">Криптовалютные Новости</h1>
+    
+    <div class="news-container">
+      <div v-for="(news, index) in newsList" :key="index" class="news-card">
+        <h3>{{ news.title }}</h3>
+        <p>{{ news.description }}</p>
+        <div class="news-meta">
+          <span>Источник: {{ news.source }}</span>
+          <span>Дата: {{ news.date }}</span>
         </div>
       </div>
     </div>
@@ -25,31 +20,79 @@ export default {
   name: 'NewsView',
   data() {
     return {
-      news: [
-        { id: 1, title: 'Биткоин установил новый рекорд цены', date: '2023-10-19', source: 'CryptoDaily' },
-        { id: 2, title: 'Ethereum обновит сеть в следующем месяце', date: '2023-10-18', source: 'CoinDesk' },
-        { id: 3, title: 'Регуляторы ужесточают правила для криптовалютных бирж', date: '2023-10-17', source: 'Bloomberg' },
-        { id: 4, title: 'Новый криптопроект привлек $50 млн инвестиций', date: '2023-10-16', source: 'Reuters' },
-        { id: 5, title: 'Аналитики прогнозируют рост биткоина до конца года', date: '2023-10-15', source: 'Forbes' },
-        { id: 6, title: 'Центральные банки исследуют CBDC', date: '2023-10-14', source: 'Financial Times' }
+      newsList: [
+        {
+          title: 'Bitcoin достиг нового максимума',
+          description: 'Крупнейшая криптовалюта установила новый рекорд по капитализации.',
+          source: 'CryptoNews',
+          date: '2024-04-11'
+        },
+        {
+          title: 'Ethereum 2.0: Обновление сети',
+          description: 'Завершено обновление сети Ethereum, улучшена производительность.',
+          source: 'Blockchain Daily',
+          date: '2024-04-10'
+        },
+        {
+          title: 'Новые правила регулирования криптовалют',
+          description: 'Центральные банки обсуждают новые правила для криптовалютного рынка.',
+          source: 'Financial Times',
+          date: '2024-04-09'
+        },
+        {
+          title: 'DeFi проекты набирают популярность',
+          description: 'Объем блокированных средств в DeFi превысил $100 миллиардов.',
+          source: 'DeFi Pulse',
+          date: '2024-04-08'
+        },
+        {
+          title: 'NFT рынок: новые тренды',
+          description: 'Анализ последних тенденций на рынке невзаимозаменяемых токенов.',
+          source: 'NFT News',
+          date: '2024-04-07'
+        }
       ]
     };
   }
 };
 </script>
 
-<style scoped>
-.card {
-  transition: transform 0.2s;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+<style>
+body {
+  background-color: #121212;
+  color: #fff;
 }
-
-.card:hover {
+.container {
+  margin-top: 20px;
+}
+.news-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+.news-card {
+  background: #1a1a1a;
+  border-radius: 10px;
+  padding: 20px;
+  transition: transform 0.3s ease;
+}
+.news-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
-
-.card-title {
-  font-weight: bold;
+.news-card h3 {
+  color: #fff;
+  margin-bottom: 15px;
+}
+.news-card p {
+  color: #ccc;
+  margin-bottom: 15px;
+  line-height: 1.5;
+}
+.news-meta {
+  display: flex;
+  justify-content: space-between;
+  color: #666;
+  font-size: 0.9em;
 }
 </style>

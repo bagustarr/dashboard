@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+        <div class="container">
         <h1 class="text-center">{{ cryptoName }} ({{ cryptoSymbol }})</h1>
 
         <div class="crypto-info">
@@ -101,5 +101,5 @@ export default {
     }
     .text-danger {
         color: #dc3545;
-    }
+        }
 </style>
